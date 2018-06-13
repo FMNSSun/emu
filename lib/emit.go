@@ -9,7 +9,7 @@ func Put_Imm12(memory io.Writer, opc, a, b, dst uint8, offs uint16) (int, error)
 	buf := []byte{0x00, 0x00, 0x00, 0x00}
 	buf[0] = opc
 	buf[1] = (a << 4) | (b << 0)
-	buf[2] = uint8(dst << 4) | uint8((offs >> 8) & 0x0F)
+	buf[2] = uint8(dst<<4) | uint8((offs>>8)&0x0F)
 	buf[3] = uint8(offs & 0xFF)
 
 	return memory.Write(buf)
@@ -54,7 +54,6 @@ func Put_Line(memory io.Writer, line string) (int, error) {
 	if len(parts) < 1 {
 		return -1, errors.New("Syntax error: Empty line!")
 	}
-
 
 	opc, ok := OPC_Table_Name2Opc[parts[0]]
 

@@ -1,12 +1,11 @@
 package lib
 
-
 type RunContext struct {
 	PC_Init   uint32
 	Registers []uint32
 	Memory    []uint8
 	PC_End    uint32
-	debugCh	chan uint32
+	debugCh   chan uint32
 }
 
 func Run(rc *RunContext) {
@@ -19,7 +18,7 @@ func Run(rc *RunContext) {
 	for {
 
 		if pc > hiaddr {
-			// hiaddr is the highest address with still 4 bytes left. 
+			// hiaddr is the highest address with still 4 bytes left.
 			// can't do this!
 			// TODO: handle this properly
 			break
@@ -60,8 +59,8 @@ func Run(rc *RunContext) {
 
 			imm12 = (uint16((b3 & 0x03)) << 8) | (uint16(b4) << 0)
 
-			if imm12 & 0x800 == 0x800 { // sign bit check?
-				imm12_s = - int16(imm12 & 0x7FF)
+			if imm12&0x800 == 0x800 { // sign bit check?
+				imm12_s = -int16(imm12 & 0x7FF)
 			} else {
 				imm12_s = int16(imm12 & 0x7FF)
 			}
@@ -89,7 +88,7 @@ func Run(rc *RunContext) {
 
 		if rc.debugCh != nil {
 			rc.debugCh <- loc
-			_ = <- rc.debugCh
+			_ = <-rc.debugCh
 		}
 
 		continue
@@ -99,7 +98,7 @@ func Run(rc *RunContext) {
 	}
 
 	rc.PC_End = pc
-	
+
 	if rc.debugCh != nil {
 		close(rc.debugCh)
 	}

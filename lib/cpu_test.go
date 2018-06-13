@@ -21,7 +21,7 @@ func setupTest() (*RunContext, *bytes.Buffer) {
 }
 
 func setMem(rc *RunContext, buf *bytes.Buffer) {
-	// Write 4 bytes to ensure that there are always 4 bytes left. 
+	// Write 4 bytes to ensure that there are always 4 bytes left.
 	buf.Write([]byte{0x00, 0x00, 0x00, 0x00})
 	rc.Memory = buf.Bytes()
 }
@@ -144,9 +144,9 @@ func TestLDH(t *testing.T) {
 func TestXOR(t *testing.T) {
 	rc, mem := setupTest()
 	setCode(t, rc, mem, []string{
-			"xor rc rd",
-			"hlt",
-		})
+		"xor rc rd",
+		"hlt",
+	})
 
 	e_regs, e_mem := copyRegsMem(rc)
 	e_regs[REG_RD] ^= e_regs[REG_RC]
@@ -159,9 +159,9 @@ func TestXOR(t *testing.T) {
 func TestADD(t *testing.T) {
 	rc, mem := setupTest()
 	setCode(t, rc, mem, []string{
-			"add re rf",
-			"hlt",
-		})
+		"add re rf",
+		"hlt",
+	})
 
 	rc.Registers[REG_RE] = 0xBEEFDAD0
 	rc.Registers[REG_RF] = 0xFEEDDEAF
@@ -177,15 +177,15 @@ func TestADD(t *testing.T) {
 func TestBEQ(t *testing.T) {
 	// Zero offset, Branch Taken
 	rc, mem := setupTest()
-	setCode(t, rc, mem, []string {
-			"beq ra rb rc 0", // 0
-         "nop",         // 4
-         "nop",         // 6
-         "hlt",         // 8
-         "nop",         // 10
-         "nop",         // 12
-         "hlt",         // 14
-		})
+	setCode(t, rc, mem, []string{
+		"beq ra rb rc 0", // 0
+		"nop",            // 4
+		"nop",            // 6
+		"hlt",            // 8
+		"nop",            // 10
+		"nop",            // 12
+		"hlt",            // 14
+	})
 
 	rc.Registers[REG_RA] = 0xFEEDFEED
 	rc.Registers[REG_RB] = 0xFEEDFEED
