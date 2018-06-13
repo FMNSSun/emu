@@ -175,6 +175,11 @@ func TestADD(t *testing.T) {
 }
 
 func TestBEQ(t *testing.T) {
+	// Beware that PC points to the next instruction
+	// not the current one so when checking if the branch
+	// jumped to hlt at 14 the PC will be offset by two (since
+	// hlt is a two byte instruction).
+
 	// Zero offset, Branch Taken
 	rc, mem := setupTest()
 	setCode(t, rc, mem, []string{
@@ -196,4 +201,120 @@ func TestBEQ(t *testing.T) {
 	Run(rc)
 
 	checkRegsMem(t, rc, e_regs, e_mem)
+	checkPCEnd(t, rc, 0x0E+0x02)
+
+	// Zero offset, Branch Not Taken
+	rc, mem = setupTest()
+	setCode(t, rc, mem, []string{
+		"beq ra rb rc 0", // 0
+		"nop",            // 4
+		"nop",            // 6
+		"hlt",            // 8
+		"nop",            // 10
+		"nop",            // 12
+		"hlt",            // 14
+	})
+
+	rc.Registers[REG_RA] = 0xFEEDF1ED
+	rc.Registers[REG_RB] = 0xFEEDFEED
+	rc.Registers[REG_RC] = 0x0000000E
+
+	e_regs, e_mem = copyRegsMem(rc)
+
+	Run(rc)
+
+	checkRegsMem(t, rc, e_regs, e_mem)
+	checkPCEnd(t, rc, 0x08+0x02)
+
+	// Positive offset, Branch Taken
+	rc, mem = setupTest()
+	setCode(t, rc, mem, []string{
+		"beq ra rb rc 2", // 0
+		"nop",            // 4
+		"nop",            // 6
+		"hlt",            // 8
+		"nop",            // 10
+		"nop",            // 12
+		"hlt",            // 14
+	})
+
+	rc.Registers[REG_RA] = 0xFEEDFEED
+	rc.Registers[REG_RB] = 0xFEEDFEED
+	rc.Registers[REG_RC] = 0x0000000C
+
+	e_regs, e_mem = copyRegsMem(rc)
+
+	Run(rc)
+
+	checkRegsMem(t, rc, e_regs, e_mem)
+	checkPCEnd(t, rc, 0x0E+0x02)
+
+	// Negative offset, Branch Taken
+	rc, mem = setupTest()
+	setCode(t, rc, mem, []string{
+		"beq ra rb rc 802", // 0
+		"nop",              // 4
+		"nop",              // 6
+		"hlt",              // 8
+		"nop",              // 10
+		"nop",              // 12
+		"hlt",              // 14
+	})
+
+	rc.Registers[REG_RA] = 0xFEEDFEED
+	rc.Registers[REG_RB] = 0xFEEDFEED
+	rc.Registers[REG_RC] = 0x00000010
+
+	e_regs, e_mem = copyRegsMem(rc)
+
+	Run(rc)
+
+	checkRegsMem(t, rc, e_regs, e_mem)
+	checkPCEnd(t, rc, 0x0E+0x02)
+
+	// Negative offset, Branch Not Taken
+	rc, mem = setupTest()
+	setCode(t, rc, mem, []string{
+		"beq ra rb rc 802", // 0
+		"nop",              // 4
+		"nop",              // 6
+		"hlt",              // 8
+		"nop",              // 10
+		"nop",              // 12
+		"hlt",              // 14
+	})
+
+	rc.Registers[REG_RA] = 0xFEEDF1ED
+	rc.Registers[REG_RB] = 0xFEEDFEED
+	rc.Registers[REG_RC] = 0x00000010
+
+	e_regs, e_mem = copyRegsMem(rc)
+
+	Run(rc)
+
+	checkRegsMem(t, rc, e_regs, e_mem)
+	checkPCEnd(t, rc, 0x08+0x02)
+
+	// Positive offset, Branch Not Taken
+	rc, mem = setupTest()
+	setCode(t, rc, mem, []string{
+		"beq ra rb rc 2", // 0
+		"nop",            // 4
+		"nop",            // 6
+		"hlt",            // 8
+		"nop",            // 10
+		"nop",            // 12
+		"hlt",            // 14
+	})
+
+	rc.Registers[REG_RA] = 0xFEEDF1ED
+	rc.Registers[REG_RB] = 0xFEEDFEED
+	rc.Registers[REG_RC] = 0x0000000C
+
+	e_regs, e_mem = copyRegsMem(rc)
+
+	Run(rc)
+
+	checkRegsMem(t, rc, e_regs, e_mem)
+	checkPCEnd(t, rc, 0x08+0x02)
 }

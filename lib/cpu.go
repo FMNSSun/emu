@@ -57,13 +57,14 @@ func Run(rc *RunContext) {
 
 			target = (b3 >> 4) & 0x03
 
-			imm12 = (uint16((b3 & 0x03)) << 8) | (uint16(b4) << 0)
-
+			imm12 = (uint16((b3 & 0x0F)) << 8) | (uint16(b4) << 0)
 			if imm12&0x800 == 0x800 { // sign bit check?
 				imm12_s = -int16(imm12 & 0x7FF)
 			} else {
 				imm12_s = int16(imm12 & 0x7FF)
 			}
+
+			pc += 2
 		}
 
 		switch opc {
